@@ -1,0 +1,2 @@
+module DoodlepadHelper
+end
