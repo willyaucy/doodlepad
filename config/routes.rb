@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   resources :doodlepads
+  resources :users
   root 'doodlepads#index'
 
   # Example of regular route:
