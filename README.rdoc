@@ -1,3 +1,6 @@
+DoodlePad is a web app that allows people to collaboratively doodle on a drawing board.
+An early version of the app written in Parse: http://doodlepad.parseapp.com/doodlepad.html
+
 == README
 
 This README would normally document whatever steps are necessary to get the
