@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "DoodlePad": {
+            "applicationId": "Jtr3L83IPPWnhiRR6dnzD31sI16DXFYggd9WwYJX", 
+            "masterKey": "80NetGzKQNGsavtXr9nYIFxLJZ1y9JSptkl9iPIe"
+        }, 
+        "_default": {
+            "link": "DoodlePad"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.18"
+    }
+}
