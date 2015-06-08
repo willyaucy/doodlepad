@@ -1,8 +1,4 @@
-var socketApp = angular.module('socketApp',[]);
-socketApp.config(['$interpolateProvider', function($interpolateProvider){
-  $interpolateProvider.startSymbol('[[').endSymbol(']]');
-}]);
-socketApp.controller('ChatController',['$http','$log','$scope',function($http,$log,$scope){
+angular.module('MainModule').controller('ChatController',['$http','$log','$scope',function($http,$log,$scope){
   io.socket.get('/chat/addconv');
   $scope.predicate = '-id';
   $scope.reverse = false;

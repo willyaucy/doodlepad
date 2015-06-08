@@ -1,1 +1,4 @@
-angular.module('MainModule', []);
+angular.module('MainModule', [])
+  .config(['$interpolateProvider', function($interpolateProvider){
+    $interpolateProvider.startSymbol('[[').endSymbol(']]');
+  }]);

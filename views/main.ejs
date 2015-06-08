@@ -1,0 +1,28 @@
+<div ng-controller="ChatController">
+  <div class="col-md-12" style="padding:100px">
+    <table  class="table">
+      <tr class="chat_message" ng-repeat="chat in chatList | orderBy:predicate:reverse | limitTo: 15">
+        <td class="col-md-12 td_class">[[chat]]</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="navbar navbar-inverse navbar-fixed-bottom" >
+    <div class="col-lg-12">
+
+      <form class="form_chat">
+        <div class="col-lg-4 col-md-3">
+          <!-- Username -->
+          <input type="text" ng-model = "chatUser" class="form-control" placeholder="TypeYourNameHere">
+        </div>
+
+        <div class="col-lg-6 col-md-5">
+          <!-- Chat Message -->
+          <input type="text" ng-model = "chatMessage" class="form-control" placeholder="TypeYourMessageHere">
+        </div>
+        <button class="btn btn-default col-lg-2 col-md-2" ng-click="sendMsg()">Send</button>
+      </form>
+
+    </div>
+  </div>
+</div>
