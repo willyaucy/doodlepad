@@ -9,16 +9,18 @@ angular.module('MainModule')
         var context = document.getElementById('canvas').getContext("2d");
 
         $('#canvas').mousedown(function(e){
-          var mouseX = e.pageX - this.offsetLeft;
-          var mouseY = e.pageY - this.offsetTop;
+          var x = e.pageX - findPos(this).x;
+          var y = e.pageY - findPos(this).y;
 
           paint = true;
-          addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false);
+          addClick(x, y, false);
           redrawAll();
         });
         $('#canvas').mousemove(function(e){
           if(paint){
-            addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+            var x = e.pageX - findPos(this).x;
+            var y = e.pageY - findPos(this).y;
+            addClick(x, y, true);
             redrawAll();
           }
         });
@@ -76,6 +78,17 @@ angular.module('MainModule')
             var x=drawing.x; var y=drawing.y; var drag=drawing.drag;
             draw(x, y, drag);
           }
+        }
+        function findPos(obj) {
+          var curleft = 0, curtop = 0;
+          if (obj.offsetParent) {
+            do {
+              curleft += obj.offsetLeft;
+              curtop += obj.offsetTop;
+            } while (obj = obj.offsetParent);
+            return { x: curleft, y: curtop };
+          }
+          return undefined;
         }
       }]
     };
