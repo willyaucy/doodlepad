@@ -5,8 +5,14 @@ angular.module('MainModule')
       restrict: 'E',
       scope: {},
       templateUrl: '/templates/drawing-board.ejs',
-      controller: ['$http','$log','$scope', function($http,$log,$scope) {
+      controller: ['$http', '$log', '$scope', '$element', function($http, $log, $scope, $element) {
         var context = document.getElementById('canvas').getContext("2d");
+
+        $scope.$element = $element;
+
+        $scope.hh = function() {
+          return $element.height();
+        };
 
         $('#canvas').mousedown(function(e){
           var x = e.pageX - findPos(this).x;
