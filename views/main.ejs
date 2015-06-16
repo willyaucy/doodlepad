@@ -1,11 +1,11 @@
 <div ng-controller="ChatController">
   <div class="col-sm-12">
 
-    <div class="col-sm-8">
+    <div class="col-lg-8 col-sm-12">
       <drawing-board></drawing-board>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-lg-4">
       <div class="col-md-12" style="padding:100px">
         <table  class="table">
           <tr class="chat_message" ng-repeat="chat in chatList | orderBy:predicate:reverse | limitTo: 15">

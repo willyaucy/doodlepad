@@ -1,3 +1,5 @@
+/* global $ */
+/* global angular */
 angular.module('MainModule')
   .directive('drawingBoard', function() {
     console.log("lol");
@@ -7,6 +9,21 @@ angular.module('MainModule')
       templateUrl: '/templates/drawing-board.ejs',
       controller: ['$http', '$log', '$scope', '$element', function($http, $log, $scope, $element) {
         var context = document.getElementById('canvas').getContext("2d");
+
+        $element.find('#canvas').resizable({
+          create: function(event, ui) {
+            console.log('initializing');
+            $element.find('#canvas').attr('width', $element.find('.drawing-canvas').width());
+            $element.find('#canvas').attr('height', $element.find('.drawing-canvas').height());
+          },
+          resize: function(event, ui) {
+            //console.log($element.find('#canvas').height());
+            $element.find('#canvas').attr('width', $element.find('#canvas').width());
+            $element.find('#canvas').attr('height', $element.find('#canvas').height());
+            redrawAll();
+            //$scope.$digest();
+          }
+        });
 
         $scope.$element = $element;
 
