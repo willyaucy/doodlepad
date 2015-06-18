@@ -8,22 +8,9 @@ angular.module('MainModule')
       scope: {},
       templateUrl: '/templates/drawing-board.ejs',
       controller: ['$http', '$log', '$scope', '$element', function($http, $log, $scope, $element) {
-        var context = document.getElementById('canvas').getContext("2d");
-
-        $element.find('#canvas').resizable({
-          create: function(event, ui) {
-            console.log('initializing');
-            $element.find('#canvas').attr('width', $element.find('.drawing-canvas').width());
-            $element.find('#canvas').attr('height', $element.find('.drawing-canvas').height());
-          },
-          resize: function(event, ui) {
-            //console.log($element.find('#canvas').height());
-            $element.find('#canvas').attr('width', $element.find('#canvas').width());
-            $element.find('#canvas').attr('height', $element.find('#canvas').height());
-            redrawAll();
-            //$scope.$digest();
-          }
-        });
+        var $canvas = $element.find('#canvas');
+        var canvas = $canvas[0];
+        var context = canvas.getContext("2d");
 
         $scope.$element = $element;
 
@@ -31,7 +18,7 @@ angular.module('MainModule')
           return $element.height();
         };
 
-        $('#canvas').mousedown(function(e){
+        $canvas.mousedown(function(e){
           var x = e.pageX - findPos(this).x;
           var y = e.pageY - findPos(this).y;
 
@@ -39,7 +26,7 @@ angular.module('MainModule')
           addClick(x, y, false);
           redrawAll();
         });
-        $('#canvas').mousemove(function(e){
+        $canvas.mousemove(function(e){
           if(paint){
             var x = e.pageX - findPos(this).x;
             var y = e.pageY - findPos(this).y;
@@ -47,13 +34,13 @@ angular.module('MainModule')
             redrawAll();
           }
         });
-        $('#canvas').mouseup(function(e){
+        $canvas.mouseup(function(e){
           paint = false;
         });
-        $('#canvas').mouseleave(function(e){
+        $canvas.mouseleave(function(e){
           paint = false;
         });
-        $('button#clearAll').click(function() {
+        $element.find('button#clearAll').click(function() {
           var query = new Parse.Query(Stroke);
           query.find({
             success: function(results) {
@@ -64,12 +51,12 @@ angular.module('MainModule')
             }
           });
           others = {}; // stores the drawings by others (should never upload anything from here)
-          checkedX = new Array(); checkedY = new Array(); checkedDrag = new Array();
-          uploadX = new Array(); uploadY = new Array(); uploadDrag = new Array();
+          checkedX = []; checkedY = []; checkedDrag = [];
+          uploadX = []; uploadY = []; uploadDrag = [];
         });
         var others = {}; // stores the drawings by others (should never upload anything from here)
-        var checkedX = new Array(); var checkedY = new Array(); var checkedDrag = new Array();
-        var uploadX = new Array(); var uploadY = new Array(); var uploadDrag = new Array();
+        var checkedX = []; var checkedY = []; var checkedDrag = [];
+        var uploadX = []; var uploadY = []; var uploadDrag = [];
         var paint;
         function addClick(x, y, dragging) {
           uploadX.push(x);
@@ -113,6 +100,23 @@ angular.module('MainModule')
           }
           return undefined;
         }
+        console.log('initializing');
+        canvas.width = $element.find('.canvas-wrapper').width();
+        canvas.height = $element.find('.canvas-wrapper').height();
+        canvas.style.width = $element.find('.canvas-wrapper').width() + 'px';
+        canvas.style.height = $element.find('.canvas-wrapper').height() + 'px';
+        redrawAll();
+
+        $element.find('.canvas-wrapper').resizable({
+          resize: function(event, ui) {
+            canvas.width = $element.find('.canvas-wrapper').width();
+            canvas.height = $element.find('.canvas-wrapper').height();
+            canvas.style.width = $element.find('.canvas-wrapper').width() + 'px';
+            canvas.style.height = $element.find('.canvas-wrapper').height() + 'px';
+            redrawAll();
+            //$scope.$digest();
+          }
+        });
       }]
     };
   });
