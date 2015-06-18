@@ -12,34 +12,42 @@ angular.module('MainModule')
         var canvas = $canvas[0];
         var context = canvas.getContext("2d");
 
-        $scope.$element = $element;
+        var others = {}; // stores the drawings by others (should never upload anything from here)
+        var checkedX = []; var checkedY = []; var checkedDrag = [];
+        var uploadX = []; var uploadY = []; var uploadDrag = [];
+        var paint;
 
-        $scope.hh = function() {
-          return $element.height();
-        };
+        /*
+         * drawing example:
+         * [
+         *   [ {x:123, y:456} ],
+         *   [ {x:23, y:35} ],
+         *   [ {x:34, y:684} ],
+         *   [ {x:159, y:314} ],
+         * ]
+         */
+        var postedDrawings = [];
+        var pendingDrawings = [];
+        var currentStroke = null;
 
         $canvas.mousedown(function(e){
           var x = e.pageX - findPos(this).x;
           var y = e.pageY - findPos(this).y;
+          currentStroke = [];
 
-          paint = true;
-          addClick(x, y, false);
+          addClick(x, y);
           redrawAll();
         });
         $canvas.mousemove(function(e){
-          if(paint){
+          if(_.isArray(currentStroke)){
             var x = e.pageX - findPos(this).x;
             var y = e.pageY - findPos(this).y;
-            addClick(x, y, true);
+            addClick(x, y);
             redrawAll();
           }
         });
-        $canvas.mouseup(function(e){
-          paint = false;
-        });
-        $canvas.mouseleave(function(e){
-          paint = false;
-        });
+        $canvas.mouseup(finalizeStroke);
+        $canvas.mouseleave(finalizeStroke);
         $element.find('button#clearAll').click(function() {
           var query = new Parse.Query(Stroke);
           query.find({
@@ -54,40 +62,49 @@ angular.module('MainModule')
           checkedX = []; checkedY = []; checkedDrag = [];
           uploadX = []; uploadY = []; uploadDrag = [];
         });
-        var others = {}; // stores the drawings by others (should never upload anything from here)
-        var checkedX = []; var checkedY = []; var checkedDrag = [];
-        var uploadX = []; var uploadY = []; var uploadDrag = [];
-        var paint;
-        function addClick(x, y, dragging) {
-          uploadX.push(x);
-          uploadY.push(y);
-          uploadDrag.push(dragging);
-        }
-        function draw(x, y, drag){
-          for(var i=0; i < x.length; i++) {
-            context.beginPath();
-            if(drag[i] && i){
-              context.moveTo(x[i-1], y[i-1]);
-            }else{
-              context.moveTo(x[i], y[i]);
-            }
-            context.lineTo(x[i], y[i]);
-            context.closePath();
-            context.stroke();
+
+        function finalizeStroke() {
+          if (!_.isArray(currentStroke)) {
+            return;
           }
+          pendingDrawings.push(currentStroke);
+          currentStroke = null;
+          //redrawAll();
         }
+
+        function addClick(x, y) {
+          if (!_.isArray(currentStroke)) {
+            throw("currentStroke is not an array");
+          }
+
+          currentStroke.push({x:x, y:y});
+        }
+
+        function draw(drawing) {
+          context.beginPath();
+          var startPoint = _.first(drawing);
+
+          context.moveTo(startPoint.x, startPoint.y);
+
+          drawing.slice(1).forEach(function(point) {
+            context.moveTo(startPoint.x, startPoint.y);
+            context.lineTo(point.x, point.y);
+            startPoint = point;
+          });
+          context.closePath();
+          context.stroke();
+        }
+
+
         function redrawAll() {
           context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
           context.strokeStyle = "#df4b26";
           context.lineJoin = "round";
           context.lineWidth = 5;
-          draw(checkedX, checkedY, checkedDrag);
-          draw(uploadX, uploadY, uploadDrag);
-          for (var sid in others) {
-            var drawing = others[sid];
-            var x=drawing.x; var y=drawing.y; var drag=drawing.drag;
-            draw(x, y, drag);
-          }
+
+          postedDrawings.forEach(draw);
+          pendingDrawings.forEach(draw);
+          currentStroke && draw(currentStroke);
         }
         function findPos(obj) {
           var curleft = 0, curtop = 0;
@@ -100,19 +117,21 @@ angular.module('MainModule')
           }
           return undefined;
         }
+
+        function synchronizeCanvasSizeWithWrapper() {
+          canvas.width = $element.find('.canvas-wrapper').width();
+          canvas.height = $element.find('.canvas-wrapper').height();
+          canvas.style.width = $element.find('.canvas-wrapper').width() + 'px';
+          canvas.style.height = $element.find('.canvas-wrapper').height() + 'px';
+        }
+
         console.log('initializing');
-        canvas.width = $element.find('.canvas-wrapper').width();
-        canvas.height = $element.find('.canvas-wrapper').height();
-        canvas.style.width = $element.find('.canvas-wrapper').width() + 'px';
-        canvas.style.height = $element.find('.canvas-wrapper').height() + 'px';
+        synchronizeCanvasSizeWithWrapper();
         redrawAll();
 
         $element.find('.canvas-wrapper').resizable({
           resize: function(event, ui) {
-            canvas.width = $element.find('.canvas-wrapper').width();
-            canvas.height = $element.find('.canvas-wrapper').height();
-            canvas.style.width = $element.find('.canvas-wrapper').width() + 'px';
-            canvas.style.height = $element.find('.canvas-wrapper').height() + 'px';
+            synchronizeCanvasSizeWithWrapper();
             redrawAll();
             //$scope.$digest();
           }
